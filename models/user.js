@@ -2,7 +2,7 @@ const {createHmac , randomBytes} = require('crypto');
 const jwt = require('jsonwebtoken');
 const {Schema , model} = require('mongoose');
 
-const JWT_SECRET = 'blogweb6789ujjjsdhuaisdasbue2937328483kfndsfhsh@#$%$%^E';
+const JWT_SECRET = process.env.JWT_SECRET || 'blogweb6789ujjjsdhuaisdasbue2937328483kfndsfhsh@#$%$%^E';
 
 const userSchema = new Schema({
     fullName: {
@@ -46,7 +46,7 @@ userSchema.pre('save', function() {
 function createTokenForUser(user) {
     return jwt.sign(
         {
-            id: user._id,
+            _id: user._id,
             email: user.email,
             role: user.role,
         },

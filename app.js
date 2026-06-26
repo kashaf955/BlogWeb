@@ -1,3 +1,6 @@
+require('dotenv').config();
+
+
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
@@ -8,11 +11,15 @@ const Blog = require('./models/blog');
 const userRoutes = require('./routes/user');
 const blogRoutes = require('./routes/blog');
 
-const app = express();
-const port = 8000;
 
-mongoose.connect('mongodb://localhost:27017/blogweb').then((e) => {
+const app = express();
+const port = process.env.PORT || 8000;
+const mongoUri = process.env.MONGODB_URL || 'mongodb://127.0.0.1:27017/blogweb';
+
+mongoose.connect(mongoUri).then(() => {
   console.log('Connected to MongoDB');
+}).catch((error) => {
+  console.error('MongoDB connection error:', error.message);
 });
 
 app.set('view engine', 'ejs');
