@@ -195,8 +195,12 @@ textarea.form-control {
 
 .card-img-top {
   width: 100%;
-  height: 180px;
+  height: 200px;
+  min-height: 200px;
+  max-height: 200px;
   object-fit: cover;
+  object-position: center;
+  display: block;
   background: #e2e8f0;
 }
 
@@ -308,6 +312,8 @@ pre {
 
   .card-img-top {
     height: 200px;
+    min-height: 200px;
+    max-height: 200px;
   }
 }
 

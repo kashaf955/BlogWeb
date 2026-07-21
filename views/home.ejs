@@ -10,7 +10,7 @@
         <% blogs.forEach(blog => { %>
             <div class = "col mt-4">
             <div class="card col" style="width: 18rem;">
-  <img src="<%= blog.coverImageURL %>" class="card-img-top" alt="...">
+  <img src="<%= blog.coverImageURL || '/images/download.jpg' %>" class="card-img-top" alt="<%= blog.title %>">
   <div class="card-body">
     <h5 class="card-title"><%= blog.title %></h5>
     <a href="/blogs/<%= blog._id %>" class="btn btn-primary">View Blog</a>
