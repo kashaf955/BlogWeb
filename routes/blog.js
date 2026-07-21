@@ -2,7 +2,8 @@ const {Router} = require('express');
 
 const Blog = require('../models/blog');
 const Comment = require('../models/comments');
-const { upload, getCoverImageURL } = require('../services/upload');
+require('../models/user'); 
+const { uploadCoverImage, getCoverImageURL } = require('../services/upload');
 
 const router = Router();
 
@@ -23,31 +24,36 @@ router.get('/:id', async (req, res) => {
             blog,
         });
     } catch (error) {
-        console.error('View blog error:', error.message);
-        return res.status(500).send('Failed to load blog.');
+        console.error('View blog error:', error);
+        return res.status(500).send(`Failed to load blog: ${error.message}`);
     }
 });
 
 router.post('/comments/:blogId', async (req, res) => {
-  if (!req.user) {
-    return res.redirect('/user/signin');
+  try {
+    if (!req.user) {
+      return res.redirect('/user/signin');
+    }
+
+    const commentText = (req.body?.comment || req.body?.content || '').trim();
+
+    if (!commentText) {
+      return res.status(400).send('Comment cannot be empty.');
+    }
+
+    await Comment.create({
+      body: commentText,
+      blogId: req.params.blogId,
+      createdBy: req.user._id || req.user.id,
+    });
+    return res.redirect(`/blogs/${req.params.blogId}`);
+  } catch (error) {
+    console.error('Comment error:', error);
+    return res.status(500).send(`Failed to add comment: ${error.message}`);
   }
-
-  const commentText = (req.body?.comment || req.body?.content || '').trim();
-
-  if (!commentText) {
-    return res.status(400).send('Comment cannot be empty.');
-  }
-
-  await Comment.create({
-    body: commentText,
-    blogId: req.params.blogId,
-    createdBy: req.user._id || req.user.id,
-  });
-  return res.redirect(`/blogs/${req.params.blogId}`);
 });
 
-router.post('/', upload.single('coverImage'), async (req, res) => {
+router.post('/', uploadCoverImage, async (req, res) => {
     try {
         if (!req.user) {
             return res.redirect('/user/signin');
@@ -68,8 +74,8 @@ router.post('/', upload.single('coverImage'), async (req, res) => {
         });
         return res.redirect(`/blogs/${blog._id}`);
     } catch (error) {
-        console.error('Create blog error:', error.message);
-        return res.status(500).send('Failed to create blog. Check server logs.');
+        console.error('Create blog error:', error);
+        return res.status(500).send(`Failed to create blog: ${error.message}`);
     }
 });
 

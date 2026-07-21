@@ -5,9 +5,12 @@ const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
 const hasCloudinary =
-  process.env.CLOUDINARY_CLOUD_NAME &&
-  process.env.CLOUDINARY_API_KEY &&
-  process.env.CLOUDINARY_API_SECRET;
+  Boolean(process.env.CLOUDINARY_URL) ||
+  Boolean(
+    process.env.CLOUDINARY_CLOUD_NAME &&
+    process.env.CLOUDINARY_API_KEY &&
+    process.env.CLOUDINARY_API_SECRET
+  );
 
 let storage;
 
@@ -39,15 +42,28 @@ if (hasCloudinary) {
   });
 }
 
+const upload = multer({ storage });
+
+function uploadCoverImage(req, res, next) {
+  upload.single('coverImage')(req, res, (err) => {
+    if (err) {
+      console.error('Upload error:', err);
+      return res.status(500).send(`Image upload failed: ${err.message}`);
+    }
+    return next();
+  });
+}
+
 function getCoverImageURL(file) {
   if (!file) return null;
-  // Cloudinary returns a full https URL in file.path
-  if (hasCloudinary) return file.path;
+  if (hasCloudinary) {
+    return file.path || file.secure_url || file.url || null;
+  }
   return `/uploads/${file.filename}`;
 }
 
 module.exports = {
-  upload: multer({ storage }),
+  uploadCoverImage,
   getCoverImageURL,
-  usingCloudinary: Boolean(hasCloudinary),
+  usingCloudinary: hasCloudinary,
 };
