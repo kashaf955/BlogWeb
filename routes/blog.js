@@ -40,24 +40,29 @@ router.post('/comments/:blogId', async (req, res) => {
 });
 
 router.post('/', upload.single('coverImage'), async (req, res) => {
-    if (!req.user) {
-        return res.redirect('/user/signin');
+    try {
+        if (!req.user) {
+            return res.redirect('/user/signin');
+        }
+
+        const title = req.body?.title?.trim();
+        const body = req.body?.body?.trim();
+
+        if (!title || !body) {
+            return res.status(400).send('Title and body are required.');
+        }
+
+        const blog = await Blog.create({
+            title,
+            body,
+            coverImageURL: getCoverImageURL(req.file),
+            createdBy: req.user._id || req.user.id,
+        });
+        return res.redirect(`/blogs/${blog._id}`);
+    } catch (error) {
+        console.error('Create blog error:', error.message);
+        return res.status(500).send('Failed to create blog. Check server logs.');
     }
-
-    const title = req.body?.title?.trim();
-    const body = req.body?.body?.trim();
-
-    if (!title || !body) {
-        return res.status(400).send('Title and body are required.');
-    }
-
-    const blog = await Blog.create({
-        title,
-        body,
-        coverImageURL: getCoverImageURL(req.file),
-        createdBy: req.user._id || req.user.id,
-    });
-    return res.redirect(`/blogs/${blog._id}`);
 });
 
 module.exports = router;

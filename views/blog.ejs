@@ -12,8 +12,12 @@
         <pre ><%= blog.body %></pre>
 
     <div class = "container mt-3">
+        <% if (blog.createdBy) { %>
         <img src="<%= blog.createdBy.profileImageURL %>" width="50" height="50" alt="User Profile Image">
          <%= blog.createdBy.fullName %>
+        <% } else { %>
+         Unknown author
+        <% } %>
     </div>
 
     <div class = "container mt-3">
