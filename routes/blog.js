@@ -13,11 +13,19 @@ router.get('/add-new', (req, res) => {
 });
 
 router.get('/:id', async (req, res) => {
-    const blog = await Blog.findById(req.params.id).populate('createdBy');
-    return res.render('blog', {
-    user: req.user,
-    blog,
-    });
+    try {
+        const blog = await Blog.findById(req.params.id).populate('createdBy');
+        if (!blog) {
+            return res.status(404).send('Blog not found');
+        }
+        return res.render('blog', {
+            user: req.user,
+            blog,
+        });
+    } catch (error) {
+        console.error('View blog error:', error.message);
+        return res.status(500).send('Failed to load blog.');
+    }
 });
 
 router.post('/comments/:blogId', async (req, res) => {
