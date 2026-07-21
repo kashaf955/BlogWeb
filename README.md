@@ -106,21 +106,6 @@ npm start
 | `GET` | `/blogs/:id` | View a single blog |
 | `POST` | `/blogs/comments/:blogId` | Add a comment (auth) |
 
-## Deploy on Render
-
-1. Push the project to GitHub.
-2. Create a new **Web Service** on Render and connect the repo.
-3. Settings:
-   - **Root Directory:** leave empty if this folder is the repo root
-   - **Build Command:** `npm install`
-   - **Start Command:** `npm start`
-4. Add environment variables in Render:
-   - `mongo_uri` — Atlas connection string (use the same DB name casing as in Atlas)
-   - `JWT_SECRET` — a strong secret
-   - `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` — from your [Cloudinary](https://cloudinary.com) dashboard
-5. Deploy.
-
-> Cover images are uploaded to **Cloudinary** when those env vars are set (recommended for Render). Without them, files go to `public/uploads/` on the server disk, which does **not** persist on Render.
 
 ## License
 
