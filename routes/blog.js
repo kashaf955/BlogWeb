@@ -79,4 +79,30 @@ router.post('/', uploadCoverImage, async (req, res) => {
     }
 });
 
+router.delete('/:id', async (req, res) => {
+    try {
+        if (!req.user) {
+            return res.status(401).send('Please sign in to delete a blog.');
+        }
+
+        const blog = await Blog.findById(req.params.id);
+        if (!blog) {
+            return res.status(404).send('Blog not found');
+        }
+
+        const ownerId = blog.createdBy ? String(blog.createdBy) : null;
+        const userId = String(req.user._id || req.user.id);
+        if (ownerId && ownerId !== userId) {
+            return res.status(403).send('You can only delete your own blogs.');
+        }
+
+        await Blog.findByIdAndDelete(req.params.id);
+        await Comment.deleteMany({ blogId: req.params.id });
+        return res.redirect(303, '/');
+    } catch (error) {
+        console.error('Delete blog error:', error);
+        return res.status(500).send(`Failed to delete blog: ${error.message}`);
+    }
+});
+
 module.exports = router;
