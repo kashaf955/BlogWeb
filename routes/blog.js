@@ -2,15 +2,42 @@ const {Router} = require('express');
 
 const Blog = require('../models/blog');
 const Comment = require('../models/comments');
-require('../models/user'); 
+require('../models/user');
 const { uploadCoverImage, getCoverImageURL } = require('../services/upload');
 
 const router = Router();
 
 router.get('/add-new', (req, res) => {
-    return res.render('addBlog' ,{
+    return res.render('addBlog', {
         user: req.user,
     });
+});
+
+router.get('/:id/edit', async (req, res) => {
+    try {
+        if (!req.user) {
+            return res.redirect('/user/signin');
+        }
+
+        const blog = await Blog.findById(req.params.id);
+        if (!blog) {
+            return res.status(404).send('Blog not found');
+        }
+
+        const ownerId = blog.createdBy ? String(blog.createdBy) : null;
+        const userId = String(req.user._id || req.user.id);
+        if (ownerId && ownerId !== userId) {
+            return res.status(403).send('You can only edit your own blogs.');
+        }
+
+        return res.render('editBlog', {
+            user: req.user,
+            blog,
+        });
+    } catch (error) {
+        console.error('Edit page error:', error);
+        return res.status(500).send(`Failed to load edit page: ${error.message}`);
+    }
 });
 
 router.get('/:id', async (req, res) => {
@@ -76,6 +103,45 @@ router.post('/', uploadCoverImage, async (req, res) => {
     } catch (error) {
         console.error('Create blog error:', error);
         return res.status(500).send(`Failed to create blog: ${error.message}`);
+    }
+});
+
+router.post('/:id/edit', uploadCoverImage, async (req, res) => {
+    try {
+        if (!req.user) {
+            return res.status(401).send('Please sign in to edit a blog.');
+        }
+
+        const blog = await Blog.findById(req.params.id);
+        if (!blog) {
+            return res.status(404).send('Blog not found');
+        }
+
+        const ownerId = blog.createdBy ? String(blog.createdBy) : null;
+        const userId = String(req.user._id || req.user.id);
+        if (ownerId && ownerId !== userId) {
+            return res.status(403).send('You can only edit your own blogs.');
+        }
+
+        const title = req.body?.title?.trim();
+        const body = req.body?.body?.trim();
+        if (!title || !body) {
+            return res.status(400).send('Title and body are required.');
+        }
+
+        blog.title = title;
+        blog.body = body;
+
+        const newCover = getCoverImageURL(req.file);
+        if (newCover) {
+            blog.coverImageURL = newCover;
+        }
+
+        await blog.save();
+        return res.redirect(`/blogs/${blog._id}`);
+    } catch (error) {
+        console.error('Edit blog error:', error);
+        return res.status(500).send(`Failed to edit blog: ${error.message}`);
     }
 });
 

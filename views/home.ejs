@@ -13,7 +13,13 @@
   <img src="<%= blog.coverImageURL || '/images/download.jpg' %>" class="card-img-top" alt="<%= blog.title %>">
   <div class="card-body">
     <h5 class="card-title"><%= blog.title %></h5>
-    <a href="/blogs/<%= blog._id %>" class="btn btn-primary">View Blog</a>
+    <div class="d-flex flex-wrap gap-2">
+      <a href="/blogs/<%= blog._id %>" class="btn btn-primary">View Blog</a>
+      <% const canEdit = locals.user && blog.createdBy && String(locals.user._id) === String(blog.createdBy._id || blog.createdBy); %>
+      <% if (canEdit) { %>
+      <a href="/blogs/<%= blog._id %>/edit" class="btn btn-outline-secondary">Edit</a>
+      <% } %>
+    </div>
   </div>
   </div>
 </div>

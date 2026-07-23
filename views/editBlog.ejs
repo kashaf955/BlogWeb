@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('./partials/head') %>
+    <title>Edit Blog</title>
+</head>
+<body>
+    <%- include('./partials/nav') %>
+    <div class="container mb-3">
+        <h2>Edit Blog</h2>
+        <form action="/blogs/<%= blog._id %>/edit" method="POST" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="title" class="form-label">Title</label>
+                <input type="text" class="form-control" id="title" name="title" value="<%= blog.title %>" required>
+            </div>
+            <div class="mb-3">
+                <label for="body" class="form-label">Body</label>
+                <textarea class="form-control" id="body" name="body" rows="5" required><%= blog.body %></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="coverImageURL" class="form-label">Cover Image (optional)</label>
+                <% if (blog.coverImageURL) { %>
+                <div class="mb-2">
+                    <img src="<%= blog.coverImageURL %>" alt="Current cover" style="max-width: 220px; height: auto; border-radius: 8px;">
+                </div>
+                <% } %>
+                <input type="file" class="form-control" id="coverImageURL" name="coverImage">
+            </div>
+            <button type="submit" class="btn btn-primary">Update Blog</button>
+            <a href="/blogs/<%= blog._id %>" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+    <%- include('./partials/scripts') %>
+</body>
+</html>
