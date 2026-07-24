@@ -5,12 +5,16 @@ const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
-const { checkForAuthenticationCookie } = require('./middlewares/authentication');
+const {
+  checkForAuthenticationCookie,
+  apiErrorHandler,
+} = require('./middlewares/authentication');
 const Blog = require('./models/blog');
 require('./models/user');
 
 const userRoutes = require('./routes/user');
 const blogRoutes = require('./routes/blog');
+const apiRoutes = require('./routes/api');
 
 
 const app = express();
@@ -19,14 +23,20 @@ const mongoUri = process.env.mongo_uri || 'mongodb://127.0.0.1:27017/Blogweb';
 
 mongoose.connect(mongoUri).then(() => {
   console.log('Connected to MongoDB');
+  app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
+  });
 }).catch((error) => {
   console.error('MongoDB connection error:', error.message);
+  console.error('Check: internet, Atlas IP allowlist (0.0.0.0/0), and mongo_uri in .env');
+  process.exit(1);
 });
 
 app.set('view engine', 'ejs');
 app.set('views', path.resolve('./views'));
 
-app.use(express.urlencoded({extended: false}));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(checkForAuthenticationCookie('token'));
 app.use(express.static(path.resolve('./public')));
@@ -42,14 +52,16 @@ app.get('/', async (req, res) => {
 });
 
 
+app.use('/api', apiRoutes);
 app.use('/user', userRoutes);
 app.use('/blogs', blogRoutes);
 
+app.use('/api', apiErrorHandler);
+
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err);
+  if (req.path.startsWith('/api')) {
+    return res.status(500).json({ error: err.message || 'Internal server error' });
+  }
   res.status(500).send(`Internal server error: ${err.message}`);
-});
-
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
 });
