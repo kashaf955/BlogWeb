@@ -46,9 +46,15 @@ router.get('/:id', async (req, res) => {
         if (!blog) {
             return res.status(404).send('Blog not found');
         }
+
+        const comments = await Comment.find({ blogId: req.params.id })
+            .populate('createdBy', 'fullName profileImageURL')
+            .sort({ createdAt: -1 });
+
         return res.render('blog', {
             user: req.user,
             blog,
+            comments,
         });
     } catch (error) {
         console.error('View blog error:', error);

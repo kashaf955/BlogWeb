@@ -37,6 +37,29 @@
 
     <div class = "container mt-3">
         <h3>Comments</h3>
+
+        <% if (comments && comments.length) { %>
+          <ul class="list-unstyled mb-4">
+            <% comments.forEach(comment => { %>
+              <li class="mb-3 pb-3 border-bottom">
+                <div class="d-flex align-items-center gap-2 mb-1">
+                  <img
+                    src="<%= comment.createdBy?.profileImageURL || '/images/download.jpg' %>"
+                    width="32"
+                    height="32"
+                    alt="Commenter"
+                    style="border-radius: 50%; object-fit: cover;"
+                  >
+                  <strong><%= comment.createdBy?.fullName || 'Unknown user' %></strong>
+                </div>
+                <p class="mb-0"><%= comment.body %></p>
+              </li>
+            <% }) %>
+          </ul>
+        <% } else { %>
+          <p class="text-muted">No comments yet.</p>
+        <% } %>
+
         <% if (locals.user) { %>
           <form action="/blogs/comments/<%= blog._id %>" method="POST">
             <div class="mb-3">
@@ -50,6 +73,8 @@
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
+          <% } else { %>
+          <p class="text-muted">Sign in to add a comment.</p>
           <% } %>
     </div>
 
