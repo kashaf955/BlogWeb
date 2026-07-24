@@ -2,7 +2,7 @@
 
 A full-stack blog app with a **CRUD REST API** (JSON) plus an EJS UI. Auth uses **JWT in cookies** .
 
-## Acceptance criteria covered
+
 
 - CRUD REST API with Express (`/api/blogs`, `/api/comments`)
 - Mongoose schemas/models (`User`, `Blog`, `Comment`)
