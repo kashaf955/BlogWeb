@@ -6,7 +6,11 @@
 </head>
 <body>
     <%- include('./partials/nav') %>
-    <div class="container mt-4" >
+    <div class="container form-page mt-4">
+        <header class="form-page-header">
+            <p class="page-eyebrow">Get started</p>
+            <h2>Create Account</h2>
+        </header>
         <form action="/user/signup" method="POST">
             <div class="mb-3">
                 <label for="fullName" class="form-label">Full Name</label>

@@ -6,8 +6,11 @@
 </head>
 <body>
     <%- include('./partials/nav') %>
-    <div class="container mb-3">
-        <h2>Edit Blog</h2>
+    <div class="container form-page mb-3">
+        <header class="form-page-header">
+            <p class="page-eyebrow">Edit</p>
+            <h2>Edit Blog</h2>
+        </header>
         <form action="/blogs/<%= blog._id %>/edit" method="POST" enctype="multipart/form-data">
             <div class="mb-3">
                 <label for="title" class="form-label">Title</label>

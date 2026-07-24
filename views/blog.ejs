@@ -6,9 +6,9 @@
 </head>
 <body>
     <%- include('./partials/nav') %>
-    <div class = "container mt-3">
+    <div class="container article-page">
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
-            <h1 class="mb-0"><%= blog.title %></h1>
+            <h1 class="mb-0 article-title"><%= blog.title %></h1>
             <% const isOwner = locals.user && blog.createdBy && String(locals.user._id) === String(blog.createdBy._id); %>
             <% if (isOwner) { %>
             <button
@@ -22,11 +22,11 @@
             <% } %>
         </div>
         <% if (blog.coverImageURL) { %>
-        <img src="<%= blog.coverImageURL %>" width="500" height="300" alt="Blog Cover Image">
+        <img class="article-cover" src="<%= blog.coverImageURL %>" width="500" height="300" alt="Blog Cover Image">
         <% } %>
-        <pre ><%= blog.body %></pre>
+        <pre><%= blog.body %></pre>
 
-    <div class = "container mt-3">
+    <div class="author-box container mt-3">
         <% if (blog.createdBy) { %>
         <img src="<%= blog.createdBy.profileImageURL || '/images/download.jpg' %>" width="50" height="50" alt="User Profile Image">
          <%= blog.createdBy.fullName %>
@@ -35,7 +35,7 @@
         <% } %>
     </div>
 
-    <div class = "container mt-3">
+    <div class="comments-panel container mt-3">
         <h3>Comments</h3>
 
         <% if (comments && comments.length) { %>
@@ -101,5 +101,6 @@
       }
     </script>
 
+</div>
 </body> 
 </html>
